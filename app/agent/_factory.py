@@ -8,8 +8,10 @@ from app.tools import get_all_tools
 from app.prompts.loader import load_prompt
 from app.memory import get_chat_message_history
 
+# Load the system prompt that defines the agent's behavior
 SYSTEM_PROMPT = load_prompt(cfg.SYSTEM_PROMPT_ID, cfg.PROMPT_FILE)
 
+# Define the prompt template that structures the conversation
 prompt = ChatPromptTemplate.from_messages([
     ("system", SYSTEM_PROMPT),
     MessagesPlaceholder(variable_name='chat_history'),
@@ -17,10 +19,13 @@ prompt = ChatPromptTemplate.from_messages([
     MessagesPlaceholder(variable_name='agent_scratchpad')
 ])
 
+# Initialize all available tools for the agent
 tools = get_all_tools()
 
+# Create the agent using LangChain's tool calling agent
 agent = create_tool_calling_agent(llm_client, tools, prompt)
 
+# Create the agent executor which handles the agent's execution loop
 agent_executor = AgentExecutor(agent=agent,
                                tools=tools,
                                verbose=True,
@@ -28,15 +33,28 @@ agent_executor = AgentExecutor(agent=agent,
 
 def get_agent_response(session_id: str, user_message: str) -> dict:
     """
-    Xử lý logic chính: lấy lịch sử chat, gọi agent, cập nhật lịch sử.
+    Process user messages through the financial agent and return responses.
+    
+    This function retrieves the chat history for the session, invokes the agent
+    with the user's message, and updates the chat history with the interaction.
+    
+    Args:
+        session_id (str): Unique identifier for the conversation session
+        user_message (str): The user's input message
+        
+    Returns:
+        dict: Contains the agent's response
     """
+    # Retrieve or create chat history for this session
     chat_history = get_chat_message_history(session_id)
 
+    # Invoke the agent with the user's message and chat history
     result = agent_executor.invoke({
         "input": user_message,
         "chat_history": chat_history.messages,
     })
 
+    # Update chat history with the new interaction
     chat_history.add_user_message(user_message)
     chat_history.add_ai_message(result["output"])
     

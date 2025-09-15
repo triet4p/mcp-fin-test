@@ -10,5 +10,8 @@ app = FastAPI(
     version='0.0.1'
 )
 
+# Include the health check endpoint for monitoring application status
 app.include_router(health.router, prefix=API_V1_BASE_ROUTE, tags=['HEALTH'])
+
+# Include the main interaction endpoint for the financial agent
 app.include_router(interact.router, prefix=API_V1_BASE_ROUTE, tags=['INTERACT'])

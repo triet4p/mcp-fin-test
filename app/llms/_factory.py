@@ -4,6 +4,19 @@ from langchain_core.language_models.chat_models import BaseChatModel
 import app.core.config as cfg
 
 def get_llm_client() -> BaseChatModel:
+    """
+    Factory function to create and return an LLM client based on configuration.
+    
+    This function reads the LLM_PROVIDER environment variable to determine
+    which language model provider to use, then initializes and returns
+    the appropriate client.
+    
+    Returns:
+        BaseChatModel: An instance of the configured language model client
+        
+    Raises:
+        ValueError: If the provider is not supported or API key is missing
+    """
     if cfg.LLM_PROVIDER == "google":
         if not cfg.GOOGLE_API_KEY:
             raise ValueError("GOOGLE_API_KEY is not set for the Google provider.")
@@ -22,4 +35,5 @@ def get_llm_client() -> BaseChatModel:
     else:
         raise ValueError(f"Unsupported LLM provider: {cfg.LLM_PROVIDER}")
     
+# Initialize the LLM client at module load time
 llm_client = get_llm_client()

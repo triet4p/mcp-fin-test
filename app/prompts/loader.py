@@ -4,10 +4,29 @@ from pathlib import Path
 PROMPTS_DIR = Path(__file__).parent
 
 def load_prompt(prompt_name: str, prompts_file: str = 'prompts.yaml') -> str:
+    """
+    Load a prompt template from a YAML file.
+    
+    This function reads prompt templates from a YAML file and returns the
+    specified prompt. It uses safe_load for security and includes error
+    handling for missing files or prompts.
+    
+    Args:
+        prompt_name (str): The name/ID of the prompt to load
+        prompts_file (str): The name of the YAML file containing prompts
+        
+    Returns:
+        str: The prompt template string
+        
+    Raises:
+        FileNotFoundError: If the prompts file doesn't exist
+        ValueError: If the requested prompt is not found or is malformed
+        RuntimeError: If there's an error parsing the YAML file
+    """
     file_path = PROMPTS_DIR / prompts_file
     try:
         with open(file_path, 'r', encoding='utf-8') as f:
-            # Sử dụng safe_load để bảo mật hơn
+            # Using safe_load for better security
             all_prompts = yaml.safe_load(f)
         
         if prompt_name not in all_prompts:
@@ -23,5 +42,5 @@ def load_prompt(prompt_name: str, prompts_file: str = 'prompts.yaml') -> str:
     except FileNotFoundError:
         raise FileNotFoundError(f"Prompts file not found at: {file_path}")
     except Exception as e:
-        # Bắt các lỗi khác như YAML không hợp lệ
+        # Catch other exceptions like invalid YAML syntax
         raise RuntimeError(f"Could not load prompt '{prompt_name}' from {file_path}: {e}")
