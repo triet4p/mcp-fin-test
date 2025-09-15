@@ -56,6 +56,11 @@ app/
 
    This command will start both the Redis memory service and the main agent service.
 
+4. **Sync schemas from MCP Servers** (Optional):
+   ```bash
+   python scripts/sync_schemas.py --url your-mcp-server-url/openapi.json --output app/tools/your-tool/schemas.py
+   ```
+
 ## API Usage
 
 Once the services are running, you can interact with the agent using the `/api/v1/interact` endpoint:

@@ -4,10 +4,12 @@ from langchain_core.tools import tool
 
 from app.core.config import ITAPIA_API_BASE_URL
 
+from .schemas import QuickCheckReportResponse
+
 @tool
 def get_itapia_quick_analysis(ticker: str,
                               daily_analysis_type: Literal['short', 'medium', 'long'] = 'medium',
-                              required_type: Literal['daily', 'intraday', 'all'] = 'all') -> dict:
+                              required_type: Literal['daily', 'intraday', 'all'] = 'all') -> QuickCheckReportResponse:
     """
     Gọi tới ứng dụng ITAPIA để lấy một báo cáo phân tích nhanh toàn cảnh. Báo cáo thường được dùng để có cái nhìn đa chiều về:
     - Technical Analysis: Góc nhìn kỹ thuật, bao gồm các chỉ số (indicators) được tính thêm như RSI, SMA, etc. Nó cũng bao gồm các pattern phân tích
@@ -38,6 +40,6 @@ def get_itapia_quick_analysis(ticker: str,
         })
         
         response.raise_for_status()
-        return response.json()
+        return QuickCheckReportResponse.model_validate(response.json())
     except requests.exceptions.HTTPError as e:
         return {'error': f'An error occured: {str(e)}'}

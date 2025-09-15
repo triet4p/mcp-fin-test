@@ -9,10 +9,19 @@ LLM_PROVIDER = os.getenv("LLM_PROVIDER").lower() # Default is google
 
 # API keys for different LLM providers
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
+
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
+OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
+OPENROUTER_BASE_URL = os.getenv("OPENROUTER_BASE_URL", 'https://openrouter.ai/api/v1')
+
 # Default chat model to use
-CHAT_MODEL = 'gemini-2.5-flash'
+CHAT_MODEL = os.getenv('CHAT_MODEL')
+if CHAT_MODEL is None:
+    if GOOGLE_API_KEY:
+        CHAT_MODEL = 'gemini-2.5-flash'
+    elif GOOGLE_API_KEY:
+        CHAT_MODEL = 'gpt-5'
 
 # API base route configuration
 API_V1_BASE_ROUTE = os.getenv('API_V1_BASE_ROUTE')

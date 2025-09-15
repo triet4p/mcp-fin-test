@@ -1,0 +1,4 @@
+from .quick_analysis import get_itapia_quick_analysis
+from .market_news import get_itapia_relevant_news, get_itapia_universal_news
+
+tools = [get_itapia_quick_analysis, get_itapia_universal_news, get_itapia_relevant_news]

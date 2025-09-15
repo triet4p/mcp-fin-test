@@ -13,7 +13,7 @@ services:
       - mcp-fin-network
   
   mcp-fin-server:
-    image: mcp-fin:1.0
+    image: mcp-fin:1.1
     container_name: mcp-fin-server
     env_file:
       - .env

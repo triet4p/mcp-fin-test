@@ -15,4 +15,3 @@ class StockRealtimePrice(BaseModel):
 # Schema cho input của tool
 class StockTickerInput(BaseModel):
     ticker: str = Field(description="Mã cổ phiếu cần tra cứu, ví dụ: 'FPT', 'AAPL'")
-    

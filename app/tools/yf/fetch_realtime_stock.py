@@ -2,7 +2,7 @@ import yfinance as yf
 from langchain_core.tools import tool
 from datetime import datetime, timezone
 
-from app.schemas.stock import StockRealtimePrice, StockTickerInput
+from .schemas import StockRealtimePrice, StockTickerInput
 
 @tool(args_schema=StockTickerInput)
 def get_stock_realtime_price(ticker: str) -> StockRealtimePrice:
@@ -25,7 +25,7 @@ def get_stock_realtime_price(ticker: str) -> StockRealtimePrice:
         
         # Kiểm tra xem có dữ liệu giá không
         if not info or info.last_price is None:
-             return StockRealtimePrice(
+            return StockRealtimePrice(
                 ticker=ticker,
                 ts=current_ts,
                 error=f"Không tìm thấy dữ liệu giao dịch real-time cho mã '{ticker}'."

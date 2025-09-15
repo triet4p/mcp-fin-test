@@ -1,6 +1,5 @@
-from langchain_google_genai import ChatGoogleGenerativeAI
-from langchain_openai import ChatOpenAI
 from langchain_core.language_models.chat_models import BaseChatModel
+from . import google, openai, openrouter
 import app.core.config as cfg
 
 def get_llm_client() -> BaseChatModel:
@@ -18,22 +17,16 @@ def get_llm_client() -> BaseChatModel:
         ValueError: If the provider is not supported or API key is missing
     """
     if cfg.LLM_PROVIDER == "google":
-        if not cfg.GOOGLE_API_KEY:
-            raise ValueError("GOOGLE_API_KEY is not set for the Google provider.")
-        return ChatGoogleGenerativeAI(
-            model=cfg.CHAT_MODEL,
-            google_api_key=cfg.GOOGLE_API_KEY,
-            convert_system_message_to_human=True
-        )
+        module_to_load = google
     elif cfg.LLM_PROVIDER == "openai":
-        if not cfg.OPENAI_API_KEY:
-            raise ValueError("OPENAI_API_KEY is not set for the OpenAI provider.")
-        return ChatOpenAI(
-            model=cfg.CHAT_MODEL,
-            api_key=cfg.OPENAI_API_KEY
-        )
+        module_to_load = openai
+    elif cfg.LLM_PROVIDER == 'openrouter':
+        module_to_load = openrouter
+        
     else:
         raise ValueError(f"Unsupported LLM provider: {cfg.LLM_PROVIDER}")
+    
+    return module_to_load.get_model()
     
 # Initialize the LLM client at module load time
 llm_client = get_llm_client()

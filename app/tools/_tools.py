@@ -1,5 +1,5 @@
-from .stock import get_stock_realtime_price
-from .itapia import get_itapia_quick_analysis
+from .yf import tools as yf_tools
+from .itapia import tools as itapia_tools
 
 def get_all_tools():
     """
@@ -12,4 +12,4 @@ def get_all_tools():
     Returns:
         list: A list of tool functions available to the agent
     """
-    return [get_stock_realtime_price, get_itapia_quick_analysis]
+    return yf_tools + itapia_tools

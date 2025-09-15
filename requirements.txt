@@ -8,8 +8,11 @@ langchain-google-genai
 langchain-openai
 google-genai
 pydantic
+pydantic[email]
 uvicorn[standard]
 pandas
 langchain_community
 redis
 pyyaml
+datamodel-code-generator
+pydantic[email]
