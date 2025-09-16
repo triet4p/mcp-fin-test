@@ -1,5 +1,5 @@
 from langchain_core.language_models.chat_models import BaseChatModel
-from . import google, openai, openrouter
+from . import google, openai, openrouter, ollama
 import app.core.config as cfg
 
 def get_llm_client() -> BaseChatModel:
@@ -22,6 +22,8 @@ def get_llm_client() -> BaseChatModel:
         module_to_load = openai
     elif cfg.LLM_PROVIDER == 'openrouter':
         module_to_load = openrouter
+    elif cfg.LLM_PROVIDER == 'ollama':
+        module_to_load = ollama
         
     else:
         raise ValueError(f"Unsupported LLM provider: {cfg.LLM_PROVIDER}")

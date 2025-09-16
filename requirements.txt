@@ -6,6 +6,7 @@ langchain
 langchain-core
 langchain-google-genai
 langchain-openai
+langchain-ollama
 google-genai
 pydantic
 pydantic[email]

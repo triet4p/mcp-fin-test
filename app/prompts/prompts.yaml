@@ -24,5 +24,9 @@ financial_agent_system_prompt_v1:
     - Luôn ghi dẫn chứng (lấy từ tài liệu nào, tài nguyên nào, API nào) cho mỗi dẫn chứng và suy luận.
     - Bạn có thể dùng các tool của chính bạn ngoài các tool tôi đã định nghĩa, nhưng phải dẫn chứng được.
 
+    **Về việc dùng tool**:
+    - Đừng trả về tên tools để người dùng phải yêu cầu *hãy dùng tool này đi* rồi mới dùng tool.
+    - **Hãy dùng và phối hợp các tools** và trả về kết quả cuối cùng cho người dùng.
+
     Luôn duy trì một cuộc trò chuyện mạch lạc và thân thiện.
   
