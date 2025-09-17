@@ -32,9 +32,6 @@ if CHAT_MODEL is None:
 # API base route configuration
 API_V1_BASE_ROUTE = os.getenv('API_V1_BASE_ROUTE', '/api/v1')
 
-# External ITAPIA service configuration
-ITAPIA_API_BASE_URL = os.getenv('ITAPIA_API_BASE_URL')
-
 # Memory configuration - determines which memory backend to use
 # Valid options: 'in-memory', 'redis'
 MEMORY_TYPE = os.getenv('MEMORY_TYPE', 'in-memory')
