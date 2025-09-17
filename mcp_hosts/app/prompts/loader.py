@@ -1,3 +1,9 @@
+"""
+Prompt loader module for the MCP Financial Agent.
+
+This module provides functionality to load prompt templates from YAML files.
+It handles file I/O, error handling, and parsing of prompt configurations.
+"""
 import yaml
 from pathlib import Path
 
@@ -11,9 +17,18 @@ def load_prompt(prompt_name: str, prompts_file: str = 'prompts.yaml') -> str:
     specified prompt. It uses safe_load for security and includes error
     handling for missing files or prompts.
     
+    The prompt YAML file should have the following structure:
+    ```yaml
+    prompt_id:
+      version: 1.0
+      description: "Description of the prompt"
+      template: |
+        The actual prompt template text
+    ```
+    
     Args:
         prompt_name (str): The name/ID of the prompt to load
-        prompts_file (str): The name of the YAML file containing prompts
+        prompts_file (str): The name of the YAML file containing prompts (default: 'prompts.yaml')
         
     Returns:
         str: The prompt template string

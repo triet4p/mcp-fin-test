@@ -1,7 +1,15 @@
+"""
+In-memory chat history implementation for the MCP Financial Agent.
+
+This module provides an in-memory implementation for storing chat histories
+using a dictionary keyed by session ID. This is useful for development
+and testing but not recommended for production deployments.
+"""
 from typing import Dict
 from langchain_community.chat_message_histories.in_memory import ChatMessageHistory as InMemoryChatMessageHistory
 
 # In-memory storage for chat histories, keyed by session ID
+# This dictionary maintains conversation history for all active sessions
 _INMEMORY_DICT: Dict[str, InMemoryChatMessageHistory] = {}
 
 def get_or_create(session_id: str) -> InMemoryChatMessageHistory:

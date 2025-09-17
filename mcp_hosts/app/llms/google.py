@@ -1,7 +1,21 @@
+"""
+Google LLM provider for the MCP Financial Agent.
+
+This module provides the implementation for Google's Gemini models.
+"""
 from langchain_google_genai import ChatGoogleGenerativeAI
 import app.core.config as cfg
 
 def get_model():
+    """
+    Create and return a Google Gemini language model client.
+    
+    Returns:
+        ChatGoogleGenerativeAI: Configured Google Gemini model client
+        
+    Raises:
+        ValueError: If GOOGLE_API_KEY is not set
+    """
     if not cfg.GOOGLE_API_KEY:
         raise ValueError("GOOGLE_API_KEY is not set for the Google provider.")
     return ChatGoogleGenerativeAI(

@@ -1,3 +1,10 @@
+"""
+LLM factory module for the MCP Financial Agent.
+
+This module provides a factory pattern implementation for creating
+language model clients based on configuration. It supports multiple
+LLM providers and handles caching configuration.
+"""
 from langchain_core.language_models.chat_models import BaseChatModel
 from . import google, openai, openrouter, ollama
 from langchain.globals import set_llm_cache
@@ -5,14 +12,14 @@ from langchain_community.cache import RedisCache
 import app.core.config as cfg
 import redis
 
-# Thiết lập cache
+# Set up LLM caching if enabled in configuration
 if cfg.LLM_CACHE_ENABLED:
     try:
-        print(f"INFO:     Bật LLM Caching với Redis tại {cfg.REDIS_URL}")
+        print(f"INFO:     Enabling LLM Caching with Redis at {cfg.REDIS_URL}")
         redis_client = redis.from_url(cfg.REDIS_URL)
         set_llm_cache(RedisCache(redis_client))
     except Exception as e:
-        print(f"WARNING:  Không thể bật LLM Caching: {e}")
+        print(f"WARNING:  Could not enable LLM Caching: {e}")
 
 def get_llm_client() -> BaseChatModel:
     """
@@ -22,11 +29,17 @@ def get_llm_client() -> BaseChatModel:
     which language model provider to use, then initializes and returns
     the appropriate client.
     
+    Supported providers:
+    - google: Google Gemini models
+    - openai: OpenAI GPT models
+    - openrouter: Models via OpenRouter API
+    - ollama: Local models via Ollama
+    
     Returns:
         BaseChatModel: An instance of the configured language model client
         
     Raises:
-        ValueError: If the provider is not supported or API key is missing
+        ValueError: If the provider is not supported
     """
     if cfg.LLM_PROVIDER == "google":
         module_to_load = google
@@ -36,7 +49,6 @@ def get_llm_client() -> BaseChatModel:
         module_to_load = openrouter
     elif cfg.LLM_PROVIDER == 'ollama':
         module_to_load = ollama
-        
     else:
         raise ValueError(f"Unsupported LLM provider: {cfg.LLM_PROVIDER}")
     

@@ -1,3 +1,8 @@
+"""
+Tools API endpoint for the MCP Servers.
+
+This module defines the endpoint for providing tool specifications to agent hosts.
+"""
 from typing import Any, Dict, List
 from fastapi import APIRouter, HTTPException
 from app.dependencies import get_tools as get_tools_dp
@@ -9,8 +14,15 @@ router = APIRouter()
          response_model=List[Dict[str, Any]])
 def get_tools():
     """
-    Cung cấp danh sách tất cả các 'Tool Specification' có sẵn.
-    Agent Host sẽ gọi endpoint này khi khởi động để khám phá các năng lực.
+    Provide a list of all available tool specifications.
+    
+    Agent hosts will call this endpoint when starting up to discover capabilities.
+    
+    Returns:
+        List[Dict[str, Any]]: List of tool specifications
+        
+    Raises:
+        HTTPException: If tool configurations are unavailable or invalid
     """
     tools = get_tools_dp()
     

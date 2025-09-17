@@ -115,7 +115,7 @@
     - limit: Số lượng rule được áp dụng để bỏ phiếu cho 1 quyết định.
     - quantitive_config: Đây là config cá nhân hóa bên phía người dùng. Nó được sử dụng để tìm kiếm các action khác nhau với cùng 1 report, khi khẩu vị người dùng khác nhau. Nó bao gồm:
         - weights: Trọng số của các metrics để tính toán điểm số. Ví dụ `cagr` có trọng số cao thì sẽ ưu tiên tìm các rules thuộc cagr. Có thể set trọng số trên nhiều metric. Lúc đó nó sẽ cố gắng tìm các rule thỏa mãn nhiều mục tiêu.
-        - constraints: Các ràng buộc cứng, mỗi cái là một cặp (min, max), biểu thị ví dụ constraints['cagr'] = (0.01, None) thì chỉ lấy các rule có 0.01 < rule < inf.
+        - constraints: Các ràng buộc cứng, mỗi cái là một cặp (min, max), biểu thị ví dụ constraints['cagr'] = [0.01, null] thì chỉ lấy các rule có 0.01 < rule < inf. Lưu ý là bạn phải dùng null trong JSON thay vì None.
         - modifiers: Bộ điều chỉnh action cuối cùng. Nó dùng các field của nó để tác động vào các mức như Position Size Percent hay Take profite, Stop Loss rate của action.
     
     **Nên dùng khi**:

@@ -1,3 +1,10 @@
+"""
+Memory factory module for the MCP Financial Agent.
+
+This module provides a factory pattern implementation for creating
+chat message history instances. It supports both in-memory and Redis
+backends for storing conversation history.
+"""
 from langchain_community.chat_message_histories import ChatMessageHistory, RedisChatMessageHistory
 import app.core.config as cfg 
 from .in_memory import get_or_create as get_or_create_in_memory_chat_history
@@ -9,6 +16,10 @@ def get_chat_message_history(session_id: str) -> ChatMessageHistory:
     This function determines which type of memory backend to use based on
     the MEMORY_TYPE configuration and returns an appropriate chat history
     instance for the given session ID.
+    
+    Supported memory types:
+    - 'redis': Persistent storage using Redis
+    - 'in-memory': Temporary storage in application memory
     
     Args:
         session_id (str): Unique identifier for the conversation session
@@ -25,4 +36,4 @@ def get_chat_message_history(session_id: str) -> ChatMessageHistory:
     elif memory_type == "in-memory":
         return get_or_create_in_memory_chat_history(session_id)
     else:
-        raise TypeError(f'Not supported memory type {memory_type}')
+        raise TypeError(f'Unsupported memory type: {memory_type}')

@@ -1,3 +1,9 @@
+"""
+Yahoo Finance real-time stock price fetcher.
+
+This module provides functionality to fetch real-time stock price data from Yahoo Finance
+using the yfinance library. It handles error cases and returns structured data.
+"""
 import yfinance as yf
 from datetime import datetime, timezone
 
@@ -5,28 +11,37 @@ from app.schemas import StockRealtimePrice
 
 def fetch_stock_realtime_price(ticker: str) -> StockRealtimePrice:
     """
-    Lấy dữ liệu giá cổ phiếu theo thời gian thực (real-time) từ API của Yahoo Finance
-
-    **Khi nào sử dụng:**
-    - Khi người dùng hỏi về "giá hiện tại", "giá hôm nay", "giá bây giờ".
-    - Khi người dùng muốn biết biến động trong ngày như giá "mở cửa", "cao nhất", "thấp nhất".
-    - Ví dụ: "giá FPT hôm nay?", "VNM đang là bao nhiêu?", "xem giá Apple".
-
-    **Giới hạn:**
-    - Công cụ này KHÔNG lấy dữ liệu lịch sử (ví dụ: giá của tuần trước).
-    - Công cụ này KHÔNG lấy tin tức hoặc báo cáo tài chính.
+    Fetch real-time stock price data from Yahoo Finance API.
+    
+    This function retrieves current price information for a specified stock ticker
+    from Yahoo Finance's API using the yfinance library.
+    
+    Usage scenarios:
+    - When users ask about "current price", "today's price", "current value"
+    - When users want to know intraday movements like "opening price", "highest", "lowest"
+    - Examples: "What's FPT's price today?", "What's VNM going for?", "Check Apple's price"
+    
+    Limitations:
+    - This tool does NOT fetch historical data (e.g., last week's price)
+    - This tool does NOT fetch news or financial reports
+    
+    Args:
+        ticker (str): Stock ticker symbol to fetch data for
+        
+    Returns:
+        StockRealtimePrice: Contains real-time price data or error information
     """
     current_ts = int(datetime.now(timezone.utc).timestamp())
     try:
-        # fast_info là lựa chọn tốt cho hiệu năng
+        # fast_info is a good choice for performance
         info = yf.Ticker(ticker).fast_info
         
-        # Kiểm tra xem có dữ liệu giá không
+        # Check if price data is available
         if not info or info.last_price is None:
             return StockRealtimePrice(
                 ticker=ticker,
                 ts=current_ts,
-                error=f"Không tìm thấy dữ liệu giao dịch real-time cho mã '{ticker}'."
+                error=f"No real-time trading data found for ticker '{ticker}'."
             )
 
         return StockRealtimePrice(
@@ -39,9 +54,9 @@ def fetch_stock_realtime_price(ticker: str) -> StockRealtimePrice:
             last_volume=info.last_volume
         )
     except Exception as e:
-        # Bắt các lỗi khác (ví dụ: mạng, ticker không tồn tại)
+        # Catch other errors (e.g., network, non-existent ticker)
         return StockRealtimePrice(
             ticker=ticker,
             ts=current_ts,
-            error=f"Đã xảy ra lỗi khi truy vấn dữ liệu cho mã {ticker}: {e}"
+            error=f"An error occurred while querying data for ticker {ticker}: {e}"
         )
