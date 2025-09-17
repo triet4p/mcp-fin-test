@@ -4,29 +4,60 @@ services:
     container_name: mcp-fin-memory-redis
     restart: unless-stopped
     env_file: 
-      - .env
+      - ./mcp_hosts/.env
     ports:
       - "6378:6379"
     volumes:
       - redis_data:/data
     networks:
       - mcp-fin-network
-  
-  mcp-fin-server:
-    image: mcp-fin:1.1
-    container_name: mcp-fin-server
+
+  yf-service:
+    image: yf-service:1.0
+    container_name: mcp-fin-yf
     env_file:
-      - .env
+      - ./yf/.env
     volumes:
-      - ./app:/mcp-fin/app
+      - ./yf/app:/yf/app
+    ports:
+      - "8004:8000"
+    networks:
+      - mcp-fin-network
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+  
+  mcp-servers:
+    image: mcp-fin-servers:1.0
+    container_name: mcp-fin-servers
+    env_file:
+      - ./mcp_servers/.env
+    volumes:
+      - ./mcp_servers/app:/mcp-servers/app
+      - ./mcp_servers/spec:/mcp-servers/spec
     depends_on:
       - mcp-fin-memory
     ports:
       - "8003:8000"
     networks:
       - mcp-fin-network
-      - itapia-network
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+  
+  mcp-hosts:
+    image: mcp-fin-hosts:1.0
+    container_name: mcp-fin-hosts
+    env_file:
+      - ./mcp_hosts/.env
+    volumes:
+      - ./mcp_hosts/app:/mcp-hosts/app
+      - ./mcp_hosts/scripts:/mcp-hosts/scripts
+    depends_on:
+      - mcp-fin-memory
+      - mcp-servers
+    ports:
+      - "8005:8000"
+    networks:
+      - mcp-fin-network
+      - itapia-network
+    command: /mcp-hosts/entrypoint.sh
 
 volumes:
   redis_data:

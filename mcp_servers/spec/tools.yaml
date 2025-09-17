@@ -1,0 +1,161 @@
+- name: get_stock_realtime_price
+  provider: yf
+  description: |
+    Lấy dữ liệu giá cổ phiếu theo thời gian thực (real-time) từ API của Yahoo Finance
+
+      **Khi nào sử dụng:**
+      - Khi người dùng hỏi về "giá hiện tại", "giá hôm nay", "giá bây giờ".
+      - Khi người dùng muốn biết biến động trong ngày như giá "mở cửa", "cao nhất", "thấp nhất".
+      - Ví dụ: "giá FPT hôm nay?", "VNM đang là bao nhiêu?", "xem giá Apple".
+
+      **Giới hạn:**
+      - Công cụ này KHÔNG lấy dữ liệu lịch sử (ví dụ: giá của tuần trước).
+      - Công cụ này KHÔNG lấy tin tức hoặc báo cáo tài chính.
+  
+  endpoint: http://yf-service:8000/api/v1/market/tickers/{ticker}/price/realtime
+  method: GET
+  args_schema:
+    type: object
+    properties:
+      ticker:
+        type: string
+        description: Mã cổ phiếu cần tra cứu
+    required:
+      - ticker
+
+- name: get_technical_analysis
+  provider: itapia
+  description: |
+    Lấy báo cáo phân tích kỹ thuật chi tiết cho một mã cổ phiếu.
+    Bao gồm các chỉ số (indicators) như RSI, SMA, MACD, và các mẫu hình (patterns)
+    như chart patterns và candlestick patterns.
+
+    **Nên dùng khi:**
+    - Người dùng hỏi về các chỉ số kỹ thuật cụ thể (RSI, SMA, ...).
+    - Người dùng muốn đánh giá cổ phiếu dựa trên biểu đồ hoặc các mẫu hình.
+    
+    **Chú ý:**
+    - Tool này CHỈ trả về dữ liệu phân tích kỹ thuật, không bao gồm tin tức hay dự báo.
+  method: GET
+  endpoint: http://api-gateway:8000/api/v1/analysis/quick/{ticker}/technical
+  args_schema:
+    type: object
+    properties:
+      ticker:
+        type: string
+        description: Mã cổ phiếu cần tra cứu, ví dụ như AAPL, NVDA, FPT, VNM.
+      daily_analysis_type:
+        type: string
+        description: "Loại phân tích hướng tới: ngắn hạn (short), trung hạn (medium), hay dài hạn (long)."
+        enum: [short, medium, long]
+        default: medium
+      required_type:
+        type: string
+        description: Loại báo cáo muốn trả về
+        enum: [daily, intraday, all]
+        default: all
+    required:
+      - ticker
+
+- name: get_forecasting_analysis
+  provider: itapia
+  description: |
+    Lấy báo cáo dự báo (forecasting) sử dụng mô hình Machine Learning.
+    Cung cấp hai loại dự báo chính:
+    - **Triple Barrier:** Dự đoán khả năng giá sẽ chạm ngưỡng Chốt lời (Take Profit) hay Cắt lỗ (Stop Loss).
+    - **N-days distribution:** Dự báo phân phối xác suất của giá trong 5 ngày (ngắn hạn) hoặc 20 ngày (trung hạn) tới.
+
+    **Nên dùng khi:**
+    - Người dùng hỏi về "dự báo", "xu hướng tương lai", "tiềm năng tăng trưởng".
+    - Người dùng muốn biết xác suất giá sẽ đi về đâu.
+    
+    **Chú ý:**
+    - Đây là kết quả dự báo từ mô hình, không phải là lời khuyên đầu tư.
+  method: GET
+  endpoint: http://api-gateway:8000/api/v1/analysis/quick/{ticker}/forecasting
+  args_schema:
+    type: object
+    properties:
+      ticker:
+        type: string
+        description: Mã cổ phiếu cần tra cứu.
+    required:
+      - ticker
+
+- name: get_news_analysis
+  provider: itapia
+  description: |
+    Lấy và phân tích các tin tức mới nhất liên quan đến một mã cổ phiếu.
+    Phân tích bao gồm tâm lý (Sentiment), các thực thể được nhắc đến (NER), và tác động (Impact) của tin tức.
+
+    **Nên dùng khi:**
+    - Người dùng hỏi về "tin tức", "sự kiện", "có tin gì mới", "tâm lý thị trường".
+    
+    **Chú ý:**
+    - Tool này không cung cấp dữ liệu giá hay phân tích kỹ thuật.
+  method: GET
+  endpoint: http://api-gateway:8000/api/v1/analysis/quick/{ticker}/news
+  args_schema:
+    type: object
+    properties:
+      ticker:
+        type: string
+        description: Mã cổ phiếu cần tra cứu.
+    required:
+      - ticker
+
+- name: get_full_advisor
+  provider: itapia
+  description: |
+    Lấy một lời khuyên (advisor) đầu tư được cá nhân hóa dựa trên phân tích toàn cảnh và các quy tắc (rules) được định nghĩa sẵn.
+    Đây là tool mạnh nhất để đưa ra một hành động cụ thể.
+    
+    **Các tham số điều chỉnh**:
+    - ticker: Mã cổ phiếu
+    - limit: Số lượng rule được áp dụng để bỏ phiếu cho 1 quyết định.
+    - quantitive_config: Đây là config cá nhân hóa bên phía người dùng. Nó được sử dụng để tìm kiếm các action khác nhau với cùng 1 report, khi khẩu vị người dùng khác nhau. Nó bao gồm:
+        - weights: Trọng số của các metrics để tính toán điểm số. Ví dụ `cagr` có trọng số cao thì sẽ ưu tiên tìm các rules thuộc cagr. Có thể set trọng số trên nhiều metric. Lúc đó nó sẽ cố gắng tìm các rule thỏa mãn nhiều mục tiêu.
+        - constraints: Các ràng buộc cứng, mỗi cái là một cặp (min, max), biểu thị ví dụ constraints['cagr'] = (0.01, None) thì chỉ lấy các rule có 0.01 < rule < inf.
+        - modifiers: Bộ điều chỉnh action cuối cùng. Nó dùng các field của nó để tác động vào các mức như Position Size Percent hay Take profite, Stop Loss rate của action.
+    
+    **Nên dùng khi**:
+    - Người dùng muốn có 1 lời khuyên về việc đầu tư.
+    - Người dùng muốn xem là với các thông tin hiện tại, liệu khi thay đổi các khẩu vị, tính cách (như tính chấp nhận rủi ro, ...) thì action và recommend được khuyên sẽ thay đổi thế nào.
+      Nghĩa là họ muốn thử nghiệm nhiều trường hợp.
+    
+    **Chú ý**:
+    - Bạn nên cho weights khác 0 trong ít nhất 5 metrics và gán constraints (min hoặc max khác none) cho ít nhất 4 metrics. Constraints ko nên quá hard, nếu ko sẽ có ít rule được áp dụng. 
+      Tôi sẽ cung cấp 1 metrics hiện tại được coi là rất tốt để bạn tham khảo và ko đặt quá nhiều kì vọng:
+      {"cagr": 0.008, "num_trades": 10, "sharpe_ratio": 0.99083288151707, "win_rate_pct": 0.5294783194452999, "profit_factor": 1.3026362902976416, "sortino_ratio": 0.27143086787988063, "max_drawdown_pct": 0.15714378223655628, "total_return_pct": 0.04950513606408939, "annual_return_stability": 0.07358453383782033}
+    - Advisor trả về sẽ ko chứa báo cáo phân tích
+    - Tools này có 1 phần ban đầu sẽ gọi phân tích nhanh (quick analysis) tại chính ITAPIA, bạn ko phải gọi tools lấy report trước khi gọi tool này.
+      Nhưng nếu bạn cần 1 báo cáo tách biệt với lời khuyên thì vẫn phải gọi cả 2 tool
+  method: POST
+  endpoint: http://api-gateway:8000/api/v1/advisor/quick/{ticker}/full
+  args_schema:
+    type: object
+    properties:
+      ticker:
+        type: string
+        description: Mã cổ phiếu để nhận lời khuyên.
+      limit:
+        type: integer
+        description: Số lượng rule tối đa được áp dụng.
+        default: 10
+      quantitive_config:
+        type: object
+        description: "Một object JSON chứa cấu hình khẩu vị đầu tư của người dùng."
+        schemas_name: QuantitivePreferencesConfigRequest
+        properties:
+          weights:
+            type: object
+            description: "Object chứa trọng số của các chỉ số, ví dụ: {'cagr': 0.8, 'sharpe_ratio': 1.2}"
+          constraints:
+            type: object
+            description: "Object chứa các ràng buộc, ví dụ: {'win_rate_pct': [0.5, null]}"
+          modifiers:
+            type: object
+            description: "Object chứa các tùy chỉnh cho hành động, ví dụ: {'take_profit_rate': 1.1}"
+    required:
+      - ticker
+      - quantitive_config

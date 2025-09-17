@@ -1,0 +1,17 @@
+fastapi
+requests
+python-dotenv
+langchain
+langchain-core
+langchain-google-genai
+langchain-openai
+langchain-ollama
+google-genai
+pydantic
+pydantic[email]
+uvicorn[standard]
+pandas
+langchain_community
+redis
+pyyaml
+datamodel-code-generator

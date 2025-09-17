@@ -1,0 +1,4 @@
+- name: yf
+  base_url: http://yf-service:8000
+- name: itapia
+  base_url: http://api-gateway:8000
