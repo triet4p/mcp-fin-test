@@ -7,12 +7,17 @@ and memory management to handle financial queries.
 """
 from langchain.agents import AgentExecutor, create_tool_calling_agent
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+from langchain_core.globals import set_llm_cache, get_llm_cache
 
 import app.core.config as cfg
 from app.llms import llm_client
 from app.clients.tools_discovery import discover_tools
 from app.prompts.loader import load_prompt
+from app.cache import get_agent_cache
 from app.memory import get_chat_message_history
+from app.memory.retriever import MemoryRetriever
+
+from ._custom import SemanticMemoryAndCacheAgentExecutor
 
 # Load the system prompt that defines the agent's behavior
 SYSTEM_PROMPT = load_prompt(cfg.SYSTEM_PROMPT_ID, cfg.PROMPT_FILE)
@@ -21,13 +26,15 @@ SYSTEM_PROMPT = load_prompt(cfg.SYSTEM_PROMPT_ID, cfg.PROMPT_FILE)
 # This template includes system instructions, chat history, user input, and agent scratchpad
 prompt = ChatPromptTemplate.from_messages([
     ("system", SYSTEM_PROMPT),
-    MessagesPlaceholder(variable_name='chat_history'),
+    MessagesPlaceholder(variable_name='retrieved_chat_history'),
     ("user", "{input}"),
     MessagesPlaceholder(variable_name='agent_scratchpad')
 ])
 
 # Initialize all available tools for the agent by discovering them from the registry
 tools = discover_tools()
+
+set_llm_cache(get_agent_cache())
 
 # Create the agent using LangChain's tool calling agent
 # This agent can understand when to use tools and how to use them properly
@@ -39,8 +46,18 @@ agent_executor = AgentExecutor(
     agent=agent,
     tools=tools,
     verbose=True,
-    handle_parsing_errors=True
+    handle_parsing_errors=True,
+    stream_runnable=False
 )
+
+final_executor = SemanticMemoryAndCacheAgentExecutor(
+    base_agent_exec=agent_executor,
+    chat_history_getter=get_chat_message_history,
+    memory_retriever=MemoryRetriever(top_k=4),
+    agent_cache=get_agent_cache()
+)
+
+print(f'INFO: LLM Cache enables: {llm_client.cache}')
 
 def get_agent_response(session_id: str, user_message: str) -> dict:
     """
@@ -56,17 +73,5 @@ def get_agent_response(session_id: str, user_message: str) -> dict:
     Returns:
         dict: Contains the agent's response with the key "response"
     """
-    # Retrieve or create chat history for this session
-    chat_history = get_chat_message_history(session_id)
-
-    # Invoke the agent with the user's message and chat history
-    result = agent_executor.invoke({
-        "input": user_message,
-        "chat_history": chat_history.messages,
-    })
-
-    # Update chat history with the new interaction
-    chat_history.add_user_message(user_message)
-    chat_history.add_ai_message(result["output"])
-    
+    result = final_executor.invoke(user_message, session_id)
     return {"response": result["output"]}

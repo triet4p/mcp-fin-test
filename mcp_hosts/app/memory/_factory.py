@@ -32,7 +32,7 @@ def get_chat_message_history(session_id: str) -> ChatMessageHistory:
     """
     memory_type = cfg.MEMORY_TYPE
     if memory_type == 'redis':
-        return RedisChatMessageHistory(session_id, url=cfg.REDIS_URL)
+        return RedisChatMessageHistory(session_id, url=cfg.REDIS_URL, ttl=cfg.REDIS_TTL)
     elif memory_type == "in-memory":
         return get_or_create_in_memory_chat_history(session_id)
     else:

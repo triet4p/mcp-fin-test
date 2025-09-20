@@ -24,6 +24,21 @@ The in-memory implementation provides temporary storage for development and test
 1. **Session Storage**: Maintains a dictionary of chat histories keyed by session ID
 2. **Instance Management**: Creates new chat history instances as needed
 
+### Memory Retriever (`retriever.py`)
+
+The memory retriever implements a vector search mechanism to retrieve the most relevant parts from chat history:
+
+1. **Vector Search**: Uses HuggingFace embeddings to convert chat history into vectors
+2. **Context Retrieval**: Retrieves relevant messages based on similarity to the current query
+3. **Temporary Storage**: Uses an in-memory Chroma vector store for efficient searching
+4. **Message Pairing**: Combines user questions and AI answers to maintain conversation context
+
+The retriever processes the conversation history by:
+- Converting message pairs (HumanMessage + AIMessage) into documents
+- Creating a temporary Chroma vector store from these documents
+- Performing similarity search against the current query
+- Returning the most relevant historical context as SystemMessages
+
 ## Configuration
 
 The memory module is configured through environment variables:
@@ -32,6 +47,7 @@ The memory module is configured through environment variables:
 - `REDIS_HOST`: Redis server hostname (defaults to localhost)
 - `REDIS_PORT`: Redis server port (defaults to 6379)
 - `REDIS_DB`: Redis database number (defaults to 0)
+- `EMBEDDING_MODEL`: Specifies the HuggingFace model for embeddings (used by retriever)
 
 ## Usage
 

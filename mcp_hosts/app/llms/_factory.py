@@ -7,19 +7,7 @@ LLM providers and handles caching configuration.
 """
 from langchain_core.language_models.chat_models import BaseChatModel
 from . import google, openai, openrouter, ollama
-from langchain.globals import set_llm_cache
-from langchain_community.cache import RedisCache
 import app.core.config as cfg
-import redis
-
-# Set up LLM caching if enabled in configuration
-if cfg.LLM_CACHE_ENABLED:
-    try:
-        print(f"INFO:     Enabling LLM Caching with Redis at {cfg.REDIS_URL}")
-        redis_client = redis.from_url(cfg.REDIS_URL)
-        set_llm_cache(RedisCache(redis_client))
-    except Exception as e:
-        print(f"WARNING:  Could not enable LLM Caching: {e}")
 
 def get_llm_client() -> BaseChatModel:
     """
@@ -52,7 +40,5 @@ def get_llm_client() -> BaseChatModel:
     else:
         raise ValueError(f"Unsupported LLM provider: {cfg.LLM_PROVIDER}")
     
-    return module_to_load.get_model()
-    
-# Initialize the LLM client at module load time
-llm_client = get_llm_client()
+    client = module_to_load.get_model()
+    return client

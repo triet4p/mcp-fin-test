@@ -12,6 +12,19 @@ services:
     networks:
       - mcp-fin-network
 
+  mcp-vector-db:
+    image: chromadb/chroma 
+    container_name: mcp-chroma-db
+    restart: unless-stopped
+    env_file:
+      - ./mcp_hosts/.env
+    ports:
+      - "8010:8000"
+    volumes:
+      - chroma_data:/chroma/.chroma/index
+    networks:
+      - mcp-fin-network
+
   yf-service:
     image: yf-service:1.0
     container_name: mcp-fin-yf
@@ -44,14 +57,17 @@ services:
   mcp-hosts:
     image: mcp-fin-hosts:1.0
     container_name: mcp-fin-hosts
+    restart: unless-stopped
     env_file:
       - ./mcp_hosts/.env
     volumes:
       - ./mcp_hosts/app:/mcp-hosts/app
       - ./mcp_hosts/scripts:/mcp-hosts/scripts
+      - mcp_hosts_hf_cache:/root/.cache/huggingface
     depends_on:
       - mcp-fin-memory
       - mcp-servers
+      - mcp-vector-db
     ports:
       - "8005:8000"
     networks:
@@ -61,6 +77,8 @@ services:
 
 volumes:
   redis_data:
+  chroma_data:
+  mcp_hosts_hf_cache:
   
 networks:
   mcp-fin-network:

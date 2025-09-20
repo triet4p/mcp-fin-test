@@ -40,7 +40,13 @@ MEMORY_TYPE = os.getenv('MEMORY_TYPE', 'in-memory')
 REDIS_HOST = os.getenv('REDIS_HOST', 'localhost')
 REDIS_PORT = os.getenv('REDIS_PORT', '6379')
 REDIS_DB = os.getenv("REDIS_DB", '0')
+REDIS_TTL = int(os.getenv('REDIS_TTL', '3600'))
 REDIS_URL = f'redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB}'
+
+# Chroma host
+CHROMA_HOST = os.getenv('CHROMA_HOST', 'localhost')
+CHROMA_PORT = os.getenv('CHROMA_PORT', '8000')
+
 
 # Prompt configuration
 PROMPT_FILE = 'prompts.yaml'
@@ -48,6 +54,10 @@ SYSTEM_PROMPT_ID = 'financial_agent_system_prompt_v1'
 
 # LLM caching configuration
 LLM_CACHE_ENABLED = True if os.getenv('LLM_CACHE_ENABLED', 'false').lower() in ['true', '1'] else False
+LLM_CACHE_TYPE = os.getenv('LLM_CACHE_TYPE', 'gptcache')
+
+# Embedding
+EMBEDDING_MODEL = os.getenv('EMBEDDING_MODEL', 'intfloat/multilingual-e5-small')
 
 # MCP Servers registry URL for tool discovery
 MCP_SERVERS_REGISTRY_URL = os.getenv("MCP_SERVERS_REGISTRY_URL")
